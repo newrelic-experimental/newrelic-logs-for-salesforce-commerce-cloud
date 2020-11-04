@@ -1,0 +1,145 @@
+# A collection of example grok patterns for parsing Salesforce Commerce Cloud Logs
+# Note: Most of these are untested with the nr-logs-for-sfcc image.
+
+# error patterns
+<grok>
+  pattern ^%{LOGLEVEL:level} %{WORD:servlet}\|%{NUMBER}\|%{DATA:sitename}\|%{DATA:action}\|%{WORD:pipeline}\|%{DATA:sessionid} %{DATA} %{DATA} %{DATA} %{DATA} %{DATA} %{DATA} %{DATA}\s+%{WTF}?%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^%{LOGLEVEL:level} %{WORD:servlet}\|%{NUMBER}(\|%{DATA:path})? %{DATA:class} %{DATA:sitename} %{WORD} %{DATA:sessionid} %{DATA} %{DATA}\s+-\s+%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^%{LOGLEVEL:level} %{DATA:threadid} %{DATA:class} %{DATA:sitename} %{WORD} %{DATA:sessionid} %{DATA} %{DATA}\s*-\s*%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^%{LOGLEVEL:level} %{WORD:servlet}\|%{NUMBER} %{DATA:class}(\s-)+\s+%{NUMBER}\s+-\s+%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^%{LOGLEVEL:level} %{DATA:threadid} %{DATA:class}(\s-)+ %{NUMBER}\s*-?\s*%{GREEDYDATA:message}
+</grok>
+
+# info patterns
+<grok>
+  pattern ^%{LOGLEVEL:level} %{DATA:threadid} %{DATA:class}(\s-)+ %{NUMBER}(\s-)*\s*%{GREEDYDATA:message}
+</grok>
+
+# warn patterns
+<grok>
+  pattern ^%{LOGLEVEL:level} %{DATA:threadid}\|%{NUMBER}\|%{DATA:job}\|%{DATA:action} %{DATA:class}\s+%{WORD} JOB %{BASE16NUM} %{BASE16NUM} %{BASE16NUM}\s+(-\s*)?%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^%{LOGLEVEL:level} %{WORD:servlet}\|%{NUMBER}\|%{DATA:sitename}\|%{DATA:action}\|%{WORD:pipeline}\|%{DATA:sessionid} %{DATA:class}\s+%{DATA} STOREFRONT %{DATA} %{DATA} %{DATA}\s+(-\s*)?%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^%{LOGLEVEL:level} %{DATA:threadid} %{DATA:class}\s+system JOB %{BASE16NUM} %{BASE16NUM}\s+%{BASE16NUM}\s+(-\s*)?%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^%{LOGLEVEL:level} %{DATA:threadid} %{DATA:class}(\s-)*\s+%{NUMBER}(\s-)*\s+%{GREEDYDATA:message}
+</grok>
+
+# debug patterns
+<grok>
+  pattern ^%{LOGLEVEL:level} %{WORD:servlet}\|%{NUMBER}\|%{DATA:sitename}\|%{DATA:action}\|%{WORD:pipeline}\|%{DATA:sessionid} %{DATA} %{DATA} %{DATA} %{DATA} %{DATA} %{DATA} %{DATA}\s+%{WTF}?%{GREEDYDATA:message}
+</grok>
+
+# quota patterns
+<grok>
+  pattern ^\[%{WORD:servlet}\|%{NUMBER}\|%{DATA:sitename}\|%{DATA:action}\|PipelineCall\|%{DATA:sessionid}\] %{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^\[[^]]+\] %{GREEDYDATA:message}
+</grok>
+
+# api patterns
+<grok>
+  pattern SCRIPT_METHOD:%{DATA:scriptMethod} in request/site %{DATA:site} pipeline %{DATA:pipeline} %{DATA:script}:%{NUMBER:scriptLine}, %{NUMBER:invocations} time(s)
+</grok>
+<grok>
+  pattern %{DATA:message} in request/site %{DATA:site} pipeline %{DATA:pipeline} %{DATA:script}:%{NUMBER:scriptLine}, %{NUMBER:invocations} time(s)
+</grok>
+<grok>
+  pattern %{WORD:class} usage violation: TEMPLATE:%{DATA:template} KEY: %{DATA:key}
+</grok>
+<grok>
+  pattern %{WORD:class} usage violation: %{DATA:details} PIPELINE:\s*%{DATA:pipeline} SITE: %{DATA}
+</grok>
+<grok>
+  pattern %{WORD:class} usage violation: %{DATA:details} PIPELET:\s*%{DATA:pipelet} KEY: %{DATA:key}
+</grok>
+
+# custom patterns
+<grok>
+  pattern ^%{LOGLEVEL:level} %{WORD:servlet}\|%{NUMBER}\|%{DATA:sitename}\|%{DATA:action}\|%{WORD:pipeline}\|%{DATA:sessionid} %{DATA:custom_logger}\s+%{WTF}?\s*%{GREEDYDATA:message}
+</grok>, #Custom website code logs
+<grok>
+  pattern ^%{LOGLEVEL:level}\s%{WORD}\|%{NUMBER}\s%{DATA:custom_logger}\s%{WTF}?%{GREEDYDATA:message}
+</grok>, #Custom job logs
+<grok>
+  pattern ^%{LOGLEVEL:level} %{DATA:threadid} %{DATA:custom_logger}\s+%{WTF}?%{GREEDYDATA:message}
+</grok>, #Custom service logs
+<grok>
+  pattern ^%{LOGLEVEL:level}\s*%{WTF}?%{GREEDYDATA:message}
+</grok>
+
+# service patterns
+<grok>
+  pattern ^%{LOGLEVEL:level} %{DATA:threadid}(\|%{NUMBER})? %{DATA:request}\s+%{WTF}?\s*%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^%{LOGLEVEL:level} %{WORD:servlet}\|%{NUMBER}\|%{DATA:sitename}\|%{DATA:action}\|%{WORD:pipeline}\|%{DATA:sessionid} %{DATA:request}\s+%{WTF}?\s*%{GREEDYDATA:message}
+</grok>
+
+# debug (staging-) patterns
+<grok>
+  pattern ^%{LOGLEVEL:level} %{WORD:servlet}\|%{NUMBER}\|%{DATA:sitename}\|%{DATA:action}\|%{WORD:pipeline}\|%{DATA:sessionid} %{DATA} %{DATA} %{DATA} %{DATA} %{DATA} %{DATA} %{DATA}\s+%{WTF}?%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^%{DATA:threadid}\|%{NUMBER}\|%{DATA:sitename}\|%{DATA:action}\s+%{GREEDYDATA:message}
+</grok>
+<grok>
+  pattern ^(%{LOGLEVEL:level} )?%{DATA:threadid}\s+%{GREEDYDATA:message}
+</grok>
+
+# jobs patterns
+<grok>
+  pattern \A%{SYSLOG5424SD} Created Job configuration for Schedule \[%{NOTCOMMA:ScheduleName}, %{NOTBRACKET:ScheduleID}\]
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} Created Job configuration for domain \[%{NOTBRACKET:DomainName}\]\. Job type \[%{BASE10NUM:JobTypeNumber}\]\. Job Configuration \[, %{NOTBRACKET:JobConfigurationID}\]
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} Started executing job pipeline\. Schedule \[%{NOTCOMMA:ScheduleName}, %{WORD:ScheduleID}\]\. Job configuration \[%{NOTCOMMA:JobConfigurationName}, %{NOTBRACKET:JobConfigurationID}\]\. Domain \[%{NOTBRACKET:DomainName}\]
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} I will not run schedule \[%{NOTCOMMA:ScheduleName}, %{NOTBRACKET:JobConfigurationID}\]\. Reason \[%{NOTBRACKET:ReasonForNotRunningSchedule}\]
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} Job \[%{NOTCOMMA:ScheduleName}, %{NOTCOMMA:ScheduleID}, %{NOTCOMMA:JobConfigurationID}, %{NOTBRACKET:sitename}\] has \[%{BASE10NUM:NumberOfResourcesAssociatedWithJob}\] resources associated with it\. ThreadId \[%{NOTPIPE:ThreadName}\|%{BASE10NUM:ThreadID}\|%{NOTPIPE:NiceName}\|%{NOTBRACKET:CodeName}\[%{BASE10NUM:NumberAfterCodeName}\]\]
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} Job \[%{NOTCOMMA:JobConfigurationName}, %{NOTCOMMA:JobConfigurationID}, %{NOTBRACKET:sitename}\] Execute pipeline\. PipeLine: %{NOTCOMMA:PipeLineName}, ThreadId: %{NOTPIPE:ThreadName}\|%{BASE10NUM:ThreadID}\|%{NOTPIPE:NiceName}\|%{NOTBRACKET:CodeName}\[%{BASE10NUM:NumberAfterCodeName}\], User: %{WORD:UserName}
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} Job \[%{NOTCOMMA:JobConfigurationName}, %{NOTCOMMA:JobConfigurationID}, %{NOTBRACKET:sitename}\] Done executing pipeline\. PipeLine: %{NOTCOMMA:PipeLineName}, ThreadId: %{NOTPIPE:ThreadName}\|%{BASE10NUM:ThreadID}\|%{NOTPIPE:NiceName}\|%{NOTBRACKET:CodeName}\[%{BASE10NUM:NumberAfterCodeName}\]
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} Job \[%{NOTCOMMA:JobConfigurationName}, %{NOTCOMMA:JobConfigurationID}, %{NOTBRACKET:sitename}\] total execution time %{BASE10NUM:TotalJobExecutionTime} ms\.
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} Job \[%{NOTCOMMA:ScheduleName}, %{NOTBRACKET:ScheduleID}\], Submitting Job Schedule for execution. ThreadId \[%{NOTBRACKET:ThreadName}\[%{BASE10NUM:NumberAfterThreadName}\]\]
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} Monitor could not be locked for Job \[%{NOTCOMMA:ScheduleName}, %{NOTBRACKET:JobConfigurationID}\]\. ThreadId: %{NOTPIPE:ThreadName}\|%{BASE10NUM:ThreadID}\[%{BASE10NUM:NumberAfterThreadID}\]
+</grok>
+<grok>
+  pattern \A%{SYSLOG5424SD} Hung job detection. Job \[%{NOTCOMMA:ScheduleName}, %{NOTBRACKET:ScheduleID}\] does not appear to hang. Action \[%{NOTBRACKET:Action}\]
+</grok>
+
+
+# old?
+<grok>
+  pattern \s%{WORD:servlet}\|%{NUMBER}\|%{DATA:site}\|%{DATA:action}\|%{WORD:pipeline}\|%{DATA:sessionId} %{DATA:exceptionClass}\s\s\-\s%{DATA:siteName}\s%{WORD:exceptionType}\s%{WORD:storefront}\s%{DATA:sessionId}\s%{DATA:random1}\s%{DATA:random2}\s%{GREEDYDATA:shortMessage}
+</grok>
+<grok>
+  pattern \s%{WORD:servlet}\|%{NUMBER}\|%{DATA:site}\|%{DATA:action}\|%{WORD:pipeline}\|%{DATA:sessionId} %{DATA:exceptionClass} %{GREEDYDATA:shortMessage}
+</grok>

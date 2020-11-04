@@ -1,50 +1,78 @@
-[![Experimental Project header](https://github.com/newrelic/opensource-website/raw/master/src/images/categories/Experimental.png)](https://opensource.newrelic.com/oss-category/#experimental)
+[![New Relic Experimental header](https://github.com/newrelic/opensource-website/raw/master/src/images/categories/Experimental.png)](https://opensource.newrelic.com/oss-category/#new-relic-experimental)
 
-# [Project Name] [build badges go here when available]
+# New Relic Logs for Salesforce Commerce Cloud
 
->[Brief description - what is the project and value does it provide? How often should users expect to get releases? How is versioning set up? Where does this project want to go?]
+A Docker image purpose-built to monitor Salesforce Commerce Cloud (fka Demandware) logs using New Relic Logs.
+
+This image contains 2 processes to collect, process and send these logs to New Relic:
+  * [cctail](https://github.com/newrelic-forks/cctail) - a node.js app used to tail and consolidate logs from any SFCC host via WebDAV.
+  * [FluentD](https://www.fluentd.org) - _an open source data collector for unified logging layer_ (their words not mine).
+    * [fluent-plugin-newrelic](https://docs.newrelic.com/docs/logs/enable-log-management-new-relic/enable-log-monitoring-new-relic/fluentd-plugin-log-forwarding) - New Relic's official FluentD plugin to pipe logs to the New Relic Logs endpoint.
+    * [fluent-grok-parser](https://docs.newrelic.com/docs/logs/enable-log-management-new-relic/enable-log-monitoring-new-relic/fluentd-plugin-log-forwarding) - New Relic's official FluentD plugin to pipe logs to the New Relic Logs endpoint.
 
 ## Installation
 
-> [Include a step-by-step procedure on how to get your code installed. Be sure to include any third-party dependencies that need to be installed separately]
-
-## Getting Started
-
->[Simple steps to start working with the software similar to a "Hello World"]
+1. Clone this repository into a suitable folder.
+```sh
+git clone https://github.com/newrelic-experimental/newrelic-logs-for-salesforce-commerce-cloud.git nr-logs-for-sfcc
+```
+2. Copy `log.conf-sample.json` to `log.conf.json` and add your Salesforce Commerce Cloud credentials to its `profiles` section.
+    * **NOTE:** DO NOT CHANGE THE `interactive` OR `fluent` SETTINGS!
+    * If you define more than one profile in `log.conf.json`, you will need to choose your profile at runtime (see [Usage](#usage)).
+    * Please [go here](https://github.com/newrelic-forks/cctail#optional-configurations) to see what other option configuratins you can apply to the SFCC log collection, i.e. limiting which logs to collect.
+3. Run the following commands to pull down this repo
+```sh
+docker build -t 'nr-logs-for-sfcc:latest' ./nr-logs-for-sfcc
+```
 
 ## Usage
 
->[**Optional** - Include more thorough instructions on how to use the software. This section might not be needed if the Getting Started section is enough. Remove this section if it's not needed.]
+1. Obtain an Insights API Insert key from your account, [as described here](https://docs.newrelic.com/docs/telemetry-data-platform/ingest-manage-data/ingest-apis/use-event-api-report-custom-events#register).
+2. Use the following docker command to run your container.
+```sh
+docker run -d -e "NEWRELIC_API_KEY=<your_Insert_API_key>" nr-logs-for-sfcc:latest
+```
+  * If you have more than one profile in your `log.conf.json`, you will need to set the `SFCC_PROFILE` environment variable when you run this container.
+```sh
+docker run -d -e "NEWRELIC_API_KEY=<your_Insert_API_key>" -e "SFCC_PROFILE=<profile_name>" nr-logs-for-sfcc:latest
+```
+3. Login to New Relic and open the [Logs UI](https://one.newrelic.com/launcher/logger.log-launcher), look for entries with `sfcc.xxxx` as their service_name.
 
-## Building
+## Troubleshooting
 
->[**Optional** - Include this section if users will need to follow specific instructions to build the software from source. Be sure to include any third party build dependencies that need to be installed separately. Remove this section if it's not needed.]
+If you are not seeing any logs in New Relic Logs:
+1. _Wait a few minutes!_ As there are a couple steps between your logs and New Relic, it can take a few minutes for them to start rolling in, especially if you have many different log types or high log volumes.
+2. Connect to your docker container at command-line and review the logs. All of the pertinent logs (`cctail.log`, `fluentd.log` and `supervisord.log`) are found in the root directory. The following example also shows how to get the container ID easily and re-use that for connecting:
+```sh
+thiscontainer=$(docker ps | grep nr-logs-for-sfcc:latest | head -n1 | awk '{print $1;}')
+docker exec -t -i $thiscontainer /bin/sh
+```
 
-## Testing
-
->[**Optional** - Include instructions on how to run tests if we include tests with the codebase. Remove this section if it's not needed.]
+  * What each log will tell you:
+    * `fluentd.log` - issues with the New Relic Insert API Key or log parsing rules. Messages like `[error]: #0 Response was 403 {}` indicate an invalid or unset key.
+    * `cctail.log` - issues with your SFCC credentials.
+    * `supervisord.log` - container-wide issues, i.e. those caused by changes made to `Dockerfile`, `entrypoint.sh` or `supervisord.conf`.
+3. You can run cctail in Debug Mode, using the `CCTAIL_ARGS` environment variable at `docker run` time. This will send more information into `cctail.log` about what logs are being polled, and how many log records are being reported from each.
+```sh
+docker run -d -e "NEWRELIC_API_KEY=<your_Insert_API_key>" -e "CCTAIL_ARGS=-d" nr-logs-for-sfcc:latest
+```
 
 ## Support
 
-New Relic has open-sourced this project. This project is provided AS-IS WITHOUT WARRANTY OR DEDICATED SUPPORT. Issues and contributions should be reported to the project here on GitHub.
-
->[Choose 1 of the 2 options below for Support details, and remove the other one.]
-
->[Option 1 - no specific thread in Community]
->We encourage you to bring your experiences and questions to the [Explorers Hub](https://discuss.newrelic.com) where our community members collaborate on solutions and new ideas.
-
->[Option 2 - thread in Community]
->New Relic hosts and moderates an online forum where customers can interact with New Relic employees as well as other customers to get help and share best practices. Like all official New Relic open source projects, there's a related Community topic in the New Relic Explorers Hub.
->You can find this project's topic/threads here: [URL for Community thread]
+New Relic has open-sourced this project. This project is provided AS-IS WITHOUT WARRANTY OR DEDICATED SUPPORT. Issues and contributions should be reported to the project here on GitHub. We encourage you to bring your experiences and questions to the [Explorers Hub](https://discuss.newrelic.com) where our community members collaborate on solutions and new ideas.
 
 ## Contributing
 
-We encourage your contributions to improve [Project Name]! Keep in mind when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
+We encourage your contributions to improve New Relic Logs for Salesforce Commerce Cloud! Keep in mind when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
 
 If you have any questions, or to execute our corporate CLA, required if your contribution is on behalf of a company,  please drop us an email at opensource@newrelic.com.
 
+**A note about vulnerabilities**
+
+As noted in our [security policy](../../security/policy), New Relic is committed to the privacy and security of our customers and their data. We believe that providing coordinated disclosure by security researchers and engaging with the security community are important means to achieve our security goals.
+
+If you believe you have found a security vulnerability in this project or any of New Relic's products or websites, we welcome and greatly appreciate you reporting it to New Relic through [HackerOne](https://hackerone.com/newrelic).
+
 ## License
 
-[Project Name] is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
-
->[If applicable: [Project Name] also uses source code from third-party libraries. You can find full details on which libraries are used and the terms under which they are licensed in the third-party notices document.]
+New Relic Logs for Salesforce Commerce Cloud is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.

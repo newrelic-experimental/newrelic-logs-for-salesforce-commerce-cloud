@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "dev01": {
+      "hostname": "dev01.yourco.demandware.net",
+      "client_id": "your-client-id",
+      "client_secret": "your-client-secret",
+      "polling_interval": 30
+    }
+  },
+  "interactive": false,
+  "fluent": {
+    "enabled": true
+  }
+}
