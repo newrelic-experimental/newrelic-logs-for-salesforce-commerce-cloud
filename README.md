@@ -6,9 +6,9 @@ A Docker image purpose-built to monitor Salesforce Commerce Cloud (fka Demandwar
 
 This image contains 2 processes to collect, process and send these logs to New Relic:
   * [cctail](https://github.com/newrelic-forks/cctail) - a node.js app used to tail and consolidate logs from any SFCC host via WebDAV.
-  * [FluentD](https://www.fluentd.org) - _an open source data collector for unified logging layer_ (their words not mine).
-    * [fluent-plugin-newrelic](https://docs.newrelic.com/docs/logs/enable-log-management-new-relic/enable-log-monitoring-new-relic/fluentd-plugin-log-forwarding) - New Relic's official FluentD plugin to pipe logs to the New Relic Logs endpoint.
-    * [fluent-grok-parser](https://docs.newrelic.com/docs/logs/enable-log-management-new-relic/enable-log-monitoring-new-relic/fluentd-plugin-log-forwarding) - New Relic's official FluentD plugin to pipe logs to the New Relic Logs endpoint.
+  * [FluentD](https://www.fluentd.org) - an open source data collector for unified logging layer.
+    * [fluent-plugin-newrelic](https://docs.newrelic.com/docs/logs/enable-log-management-new-relic/enable-log-monitoring-new-relic/fluentd-plugin-log-forwarding) - New Relic's official FluentD plugin to send log events to the New Relic Logs endpoint.
+    * [fluent-grok-parser](https://github.com/fluent/fluent-plugin-grok-parser) - Fluentd's official plugin that enables Logstash's Grok-like parsing logic.
 
 ## Installation
 
