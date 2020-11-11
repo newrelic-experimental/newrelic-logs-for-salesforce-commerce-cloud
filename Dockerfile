@@ -22,6 +22,4 @@ COPY entrypoint.sh /bin/
 COPY fluent.conf /fluentd/etc/
 COPY supervisord.conf /etc/supervisord.conf
 COPY --from=0 cctail cctail
-
-# Mapped at runtime (for security purposes)
-# COPY log.conf.json .
+COPY log.conf-docker.json ./log.conf.json

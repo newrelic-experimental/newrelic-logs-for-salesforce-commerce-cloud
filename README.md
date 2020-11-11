@@ -12,15 +12,11 @@ This image contains 2 processes to collect, process and send these logs to New R
 
 ## Installation
 
-1. Clone this repository into a suitable folder.
+1. Use `git` to clone this repository into a suitable folder:
 ```sh
 git clone https://github.com/newrelic-experimental/newrelic-logs-for-salesforce-commerce-cloud.git nr-logs-for-sfcc
 ```
-2. Copy `log.conf-sample.json` to `log.conf.json` and add your Salesforce Commerce Cloud credentials to its `profiles` section.
-    * **NOTE:** DO NOT CHANGE THE `interactive` OR `fluent` SETTINGS!
-    * If you define more than one profile in `log.conf.json`, you will need to choose your profile at runtime (see [Usage](#usage)).
-    * Please [go here](https://github.com/newrelic-forks/cctail#optional-configurations) to see what other option configuratins you can apply to the SFCC log collection, i.e. limiting which logs to collect.
-3. Run the following commands to pull down this repo
+2. Use `docker` to build a container from this image:
 ```sh
 docker build -t 'nr-logs-for-sfcc:latest' ./nr-logs-for-sfcc
 ```
@@ -30,11 +26,11 @@ docker build -t 'nr-logs-for-sfcc:latest' ./nr-logs-for-sfcc
 1. Obtain an Insights API Insert key from your account, [as described here](https://docs.newrelic.com/docs/telemetry-data-platform/ingest-manage-data/ingest-apis/use-event-api-report-custom-events#register).
 2. Use the following docker command to run your container.
 ```sh
-docker run -d -e "NEWRELIC_API_KEY=<your_Insert_API_key>" nr-logs-for-sfcc:latest
+docker run -d -e "NEWRELIC_API_KEY=<your_Insert_API_key>" -e "SFCC_HOSTNAME=<your_sfcc_host>" -e "SFCC_CLIENT_ID=<your_sfcc_client_id>" -e "SFCC_CLIENT_SECRET=<your_sfcc_client_secret>" nr-logs-for-sfcc:latest
 ```
-  * If you have more than one profile in your `log.conf.json`, you will need to set the `SFCC_PROFILE` environment variable when you run this container.
+* If you prefer to store these environment variables in a file like [this example](./sfcc.env), you can run docker like so:
 ```sh
-docker run -d -e "NEWRELIC_API_KEY=<your_Insert_API_key>" -e "SFCC_PROFILE=<profile_name>" nr-logs-for-sfcc:latest
+docker run -d --env-file=sfcc.env nr-logs-for-sfcc:latest
 ```
 3. Login to New Relic and open the [Logs UI](https://one.newrelic.com/launcher/logger.log-launcher), look for entries with `sfcc.xxxx` as their service_name.
 
@@ -54,9 +50,12 @@ docker exec -t -i $thiscontainer /bin/sh
     * `supervisord.log` - container-wide issues, i.e. those caused by changes made to `Dockerfile`, `entrypoint.sh` or `supervisord.conf`.
 3. You can run cctail in Debug Mode, using the `CCTAIL_ARGS` environment variable at `docker run` time. This will send more information into `cctail.log` about what logs are being polled, and how many log records are being reported from each.
 ```sh
-docker run -d -e "NEWRELIC_API_KEY=<your_Insert_API_key>" -e "CCTAIL_ARGS=-d" nr-logs-for-sfcc:latest
+docker run -d -e "CCTAIL_ARGS=-d" -e "NEWRELIC_API_KEY=<your_Insert_API_key>" -e "SFCC_HOSTNAME=<your_sfcc_host>" -e "SFCC_CLIENT_ID=<your_sfcc_client_id>" -e "SFCC_CLIENT_SECRET=<your_sfcc_client_secret>" nr-logs-for-sfcc:latest
 ```
-
+or (if using an env file):
+```sh
+docker run -d -e "CCTAIL_ARGS=-d" -env-file=sfcc.env nr-logs-for-sfcc:latest
+```
 ## Support
 
 New Relic has open-sourced this project. This project is provided AS-IS WITHOUT WARRANTY OR DEDICATED SUPPORT. Issues and contributions should be reported to the project here on GitHub. We encourage you to bring your experiences and questions to the [Explorers Hub](https://discuss.newrelic.com) where our community members collaborate on solutions and new ideas.

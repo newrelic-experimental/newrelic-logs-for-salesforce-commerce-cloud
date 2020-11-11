@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "sfcc": {
+      "hostname": "ENV_SFCC_HOSTNAME",
+      "client_id": "ENV_SFCC_CLIENT_ID",
+      "client_secret": "ENV_SFCC_CLIENT_SECRET",
+      "polling_interval": 30
+    }
+  },
+  "interactive": false,
+  "fluent": {
+    "enabled": true
+  }
+}
