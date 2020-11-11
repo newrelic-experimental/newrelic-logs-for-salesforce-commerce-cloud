@@ -20,6 +20,8 @@ RUN apk add --no-cache --update --virtual .build-deps \
 
 COPY entrypoint.sh /bin/
 COPY fluent.conf /fluentd/etc/
-COPY log.conf.json .
 COPY supervisord.conf /etc/supervisord.conf
 COPY --from=0 cctail cctail
+
+# Mapped at runtime (for security purposes)
+# COPY log.conf.json .
