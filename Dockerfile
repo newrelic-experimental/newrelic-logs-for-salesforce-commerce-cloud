@@ -4,7 +4,7 @@ USER root
 RUN apk add --no-cache --update git \
   && git clone https://github.com/newrelic-forks/cctail.git cctail
 
-WORKDIR cctail
+WORKDIR /cctail
 RUN npm install
 
 FROM fluent/fluentd:edge
