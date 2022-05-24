@@ -23,10 +23,10 @@ docker build -t 'nr-logs-for-sfcc:latest' ./nr-logs-for-sfcc
 
 ## Usage
 
-1. Obtain an Insights API Insert key from your account, [as described here](https://docs.newrelic.com/docs/telemetry-data-platform/ingest-manage-data/ingest-apis/use-event-api-report-custom-events#register).
+1. Get the [License Key](https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/#license-key) for your account, which can be found [here](https://one.newrelic.com/launcher/api-keys-ui.api-keys-launcher)
 2. Use the following docker command to run your container.
 ```sh
-docker run -d -e "NEWRELIC_API_KEY=<your_Insert_API_key>" -e "SFCC_HOSTNAME=<your_sfcc_host>" -e "SFCC_CLIENT_ID=<your_sfcc_client_id>" -e "SFCC_CLIENT_SECRET=<your_sfcc_client_secret>" nr-logs-for-sfcc:latest
+docker run -d -e "NEWRELIC_API_KEY=<your_license_key>" -e "SFCC_HOSTNAME=<your_sfcc_host>" -e "SFCC_CLIENT_ID=<your_sfcc_client_id>" -e "SFCC_CLIENT_SECRET=<your_sfcc_client_secret>" nr-logs-for-sfcc:latest
 ```
 * If you prefer to store these environment variables in a file like [this example](./sfcc.env), you can run docker like so:
 ```sh
@@ -45,12 +45,12 @@ docker exec -t -i $thiscontainer /bin/sh
 ```
 
   * What each log will tell you:
-    * `fluentd.log` - issues with the New Relic Insert API Key or log parsing rules. Messages like `[error]: #0 Response was 403 {}` indicate an invalid or unset key.
+    * `fluentd.log` - issues with the New Relic License Key or log parsing rules. Messages like `[error]: #0 Response was 403 {}` indicate an invalid or unset key.
     * `cctail.log` - issues with your SFCC credentials.
     * `supervisord.log` - container-wide issues, i.e. those caused by changes made to `Dockerfile`, `entrypoint.sh` or `supervisord.conf`.
 3. You can run cctail in Debug Mode, using the `CCTAIL_ARGS` environment variable at `docker run` time. This will send more information into `cctail.log` about what logs are being polled, and how many log records are being reported from each.
 ```sh
-docker run -d -e "CCTAIL_ARGS=-d" -e "NEWRELIC_API_KEY=<your_Insert_API_key>" -e "SFCC_HOSTNAME=<your_sfcc_host>" -e "SFCC_CLIENT_ID=<your_sfcc_client_id>" -e "SFCC_CLIENT_SECRET=<your_sfcc_client_secret>" nr-logs-for-sfcc:latest
+docker run -d -e "CCTAIL_ARGS=-d" -e "NEWRELIC_API_KEY=<your_license_key>" -e "SFCC_HOSTNAME=<your_sfcc_host>" -e "SFCC_CLIENT_ID=<your_sfcc_client_id>" -e "SFCC_CLIENT_SECRET=<your_sfcc_client_secret>" nr-logs-for-sfcc:latest
 ```
 or (if using an env file):
 ```sh
