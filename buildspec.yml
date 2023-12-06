@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 343780020777.dkr.ecr.us-east-1.amazonaws.com
+
+  build:
+    commands:
+      - echo Building Docker image...
+      - docker build -t log_ingestion_grafana .
+
+  post_build:
+    commands:
+      - echo Tagging Docker image...
+      - docker tag log_ingestion_grafana:latest 343780020777.dkr.ecr.us-east-1.amazonaws.com/log_ingestion_grafana:latest
+      - echo Pushing Docker image to Amazon ECR...
+
